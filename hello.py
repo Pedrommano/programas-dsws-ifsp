@@ -1,44 +1,62 @@
-from __future__ import print_function
-from flask import Flask, request, render_template, session, redirect, url_for, flask
-from flask_moment import Moment
-# from datetime import datetime, UTC
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, SelectField
+from wtforms.validators import DataRequired
+from flask import Flask, render_template, session, redirect, url_for, flash, request
 from datetime import datetime
-from forms import NameForm
-import sys
 
 app = Flask(__name__)
-bootstrap = Bootstrap(app)
-moment = Moment(app)
-app.config['SECRET_KEY'] = 'chave-forte'
+app.config['SECRET_KEY'] = 'Chave forte'
+
+class NameForm(FlaskForm):
+    name = StringField('Informe o seu nome:', validators=[DataRequired()])
+    sobrenome = StringField('Informe o seu sobrenome:', validators=[DataRequired()])
+    instituicao = StringField('Informe a sua Instituição de ensino:', validators=[DataRequired()])
+    disciplina = SelectField('Informe a sua disciplina:', choices=[('DSWA5', 'DSWA5')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 @app.route('/', methods=['GET', 'POST'])
-def hello_world():
-   now = datetime.utcnow()
-#    now = datetime.now(UTC)
-   form = NameForm()
-   ip = None
-   host = None
-  
-   if form.validate_on_submit():
-       print(form.subject.data, file=sys.stderr)
-       old_name = session.get('name')
-       if old_name is not None and old_name != form.name.data:
-           flash('Você alterou o seu nome!')
-       session['name'] = form.name.data
-       session['institution'] = form.institution.data
-       session['subject'] = form.subject.data
+def index():
+    form = NameForm()
+    if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Parece que você alterou seu nome!')
+        
+        # Salvando dados no session
+        session['name'] = form.name.data
+        session['sobrenome'] = form.sobrenome.data
+        session['instituicao'] = form.instituicao.data
+        session['disciplina'] = form.disciplina.data
+        
+        return redirect(url_for('index'))
 
-       form.name.data = ''
-       ip = request.remote_addr
-       host = request.host
-    #    return redirect(url_for('index'))
-   return render_template('index.html', current_time=now, form=form, name=session.get('name'), ip=ip, host=host, institution=session.get('institution'), subject=session.get('subject'))
+    # Captura o IP e o host
+    ip_remoto = request.remote_addr
+    host_app = request.host
 
+    # Define o start_time na sessão caso ainda não esteja definido
+    if 'start_time' not in session:
+        session['start_time'] = datetime.now().isoformat()
+    
+    # Carrega o start_time e calcula a diferença de tempo
+    start_time = datetime.fromisoformat(session['start_time'])
+    now = datetime.now()
+    time_elapsed = now - start_time
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
+    # Passa 'now', 'start_time' e 'time_elapsed' para o template
+    return render_template(
+        'index.html', 
+        form=form, 
+        name=session.get('name'), 
+        sobrenome=session.get('sobrenome'),
+        instituicao=session.get('instituicao'), 
+        disciplina=session.get('disciplina'), 
+        ip_remoto=ip_remoto, 
+        host_app=host_app, 
+        now=now,
+        start_time=start_time,
+        time_elapsed=time_elapsed
+    )
 
-@app.errorhandler(500)
-def page_internal_server_error(e):
-    return render_template('500.html'), 500
+if __name__ == '__main__':
+    app.run(debug=True)
