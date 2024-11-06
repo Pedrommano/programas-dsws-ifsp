@@ -1,34 +1,27 @@
-{% extends 'base.html'%}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block head %}
-{{ super() }}
+{% extends "base.html" %}
 
-
-{% endblock %}
 {% block content %}
-<div class="container">
-    {% for message in  get_flashed_messages() %}
-<div class="alert alert-warning">
-   <button class="close" type="button" data-dismiss="alert">&times;</button>
-   {{ message }}   
-</div>
-{% endfor %}
-<div class="container-fluid page-header">
-   <h1 class=" display-1"> Olá, {% if name %}{{name}}{% else %}Estranho{% endif %}!</h1>
-   <h3>A sua Instituição de ensino é {{ institution }}</h3>
-   <h3>Está cursando a disciplina de {% if subject%}{{ subject }}{% endif %}</h3>
-   <h4>O IP do computador: {{ ip }}</h4>
-   <h4>O host da aplicação é: {{ host }}</h4>
-</div>
-
-
-
-<form method="POST">
-   {{ wtf.quick_form(form)}}
-
-</form>
-   
-    <p>The local date and time is {{ moment(current_time).format('LLL') }}.</p>
-    <p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
-</div>
+  <h1>Bem-vindo!</h1>
+  <p>Nome: {{ name }}</p>
+  <p>Sobrenome: {{ sobrenome }}</p>
+  <p>Instituição: {{ instituicao }}</p>
+  <p>Disciplina: {{ disciplina }}</p>
+  <p>IP Remoto: {{ ip_remoto }}</p>
+  <p>Host: {{ host_app }}</p>
+  
+  <!-- Exibindo o tempo decorrido -->
+  {% if start_time and now %}
+    <p>Você iniciou a sessão em: {{ start_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>Hora atual: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>Tempo decorrido: {{ time_elapsed }}</p>
+  {% endif %}
+  
+  <form method="POST" action="{{ url_for('index') }}">
+    {{ form.hidden_tag() }}
+    <p>{{ form.name.label }} {{ form.name() }}</p>
+    <p>{{ form.sobrenome.label }} {{ form.sobrenome() }}</p>
+    <p>{{ form.instituicao.label }} {{ form.instituicao() }}</p>
+    <p>{{ form.disciplina.label }} {{ form.disciplina() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
 {% endblock %}
