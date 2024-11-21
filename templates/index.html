@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
@@ -14,3 +15,32 @@
 </div>
 {{ wtf.quick_form(form) }}
 {% endblock %}
+=======
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Bem-vindo!</h1>
+  <p>Nome: {{ name }}</p>
+  <p>Sobrenome: {{ sobrenome }}</p>
+  <p>Instituição: {{ instituicao }}</p>
+  <p>Disciplina: {{ disciplina }}</p>
+  <p>IP Remoto: {{ ip_remoto }}</p>
+  <p>Host: {{ host_app }}</p>
+  
+  <!-- Exibindo o tempo decorrido -->
+  {% if start_time and now %}
+    <p>Você iniciou a sessão em: {{ start_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>Hora atual: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>Tempo decorrido: {{ time_elapsed }}</p>
+  {% endif %}
+  
+  <form method="POST" action="{{ url_for('index') }}">
+    {{ form.hidden_tag() }}
+    <p>{{ form.name.label }} {{ form.name() }}</p>
+    <p>{{ form.sobrenome.label }} {{ form.sobrenome() }}</p>
+    <p>{{ form.instituicao.label }} {{ form.instituicao() }}</p>
+    <p>{{ form.disciplina.label }} {{ form.disciplina() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
+{% endblock %}
+>>>>>>> 290e9710da761351f0b629265fa5f203e45522db
