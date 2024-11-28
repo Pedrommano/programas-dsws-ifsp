@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Avaliação Contínua: Aula 060{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Olá, {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
+    <h1>Olá, {% if name %}{{ name }}{% else %}estranho{% endif %}!</h1>
     {% if not known %}
     <p>Prazer em conhecê-lo!</p>
     {% else %}
     <p>Feliz em vê-lo novamente!</p>
     {% endif %}
 </div>
+
 {{ wtf.quick_form(form) }}
 
 <h2>Relação de usuários cadastrados</h2>
@@ -23,13 +24,42 @@
         </tr>
     </thead>
     <tbody>
-        {% for key in user_all %}
+        {% for user in users %}
         <tr>
-            <td>{{ key.username }}</td>
-            <td>{{ key.role.name }}</td>            
+            <td>{{ user.username }}</td>
+            <td>{{ user.role.name }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
+<h2>Relação de funções cadastradas</h2>
+
+<h4>Quantidade: {{user_by_role|length}}</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Funções</th>
+            <th>Usuários</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for obj in user_by_role%}
+        <tr>
+            <td>{{obj.role}}</td>
+            <td>
+                <ol>
+                    {%for user in obj.users %}
+                    <li>
+                        {{user.username}}
+                    </li>
+                    {%endfor%}
+                </ol>
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+
+</table>
 {% endblock %}
